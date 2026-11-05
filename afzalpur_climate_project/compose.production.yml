@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      - PORT=8080

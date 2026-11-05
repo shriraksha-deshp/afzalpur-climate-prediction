@@ -1,0 +1,13 @@
+{
+  "name": "afzalpur-climate-app",
+  "version": "1.0.0",
+  "description": "Climate and drought forecasting system for Afzalpur Taluk, Kalaburagi",
+  "main": "src/server.py",
+  "scripts": {
+    "forecast": "python scripts/forecast_engine.py",
+    "start": "python src/server.py",
+    "dev": "python scripts/forecast_engine.py && python src/server.py"
+  },
+  "keywords": ["climate", "random-forest", "drought", "afzalpur"],
+  "license": "MIT"
+}

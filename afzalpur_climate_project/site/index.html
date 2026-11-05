@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afzalpur Taluk Climate & Drought Analytics (1996–2055)</title>
+    <!-- Plotly CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- KaTeX for Mathematical Formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" 
+            onload="renderMathInElement(document.body);"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #0b1120; color: #f8fafc; margin: 0; padding: 24px; }
+        .container { max-width: 1360px; margin: auto; }
+        .header { margin-bottom: 24px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+        .header h1 { margin: 0; font-size: 26px; color: #38bdf8; letter-spacing: -0.5px; }
+        .tag { background: #0369a1; color: #e0f2fe; padding: 5px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 950px) { .grid-2 { grid-template-columns: 1fr; } }
+        .card { background: #131c31; border: 1px solid #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .formula-box { background: #070d19; border-left: 4px solid #38bdf8; padding: 14px 18px; border-radius: 6px; margin: 12px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #1e293b; }
+        th { background: #0b1120; color: #94a3b8; font-weight: 600; position: sticky; top: 0; }
+        tr:hover { background: #1e293b; }
+        .table-scroll { max-height: 440px; overflow-y: auto; border: 1px solid #1e293b; border-radius: 6px; }
+        select, button { background: #0b1120; color: #f8fafc; padding: 8px 14px; border: 1px solid #334155; border-radius: 6px; font-size: 13.5px; cursor: pointer; outline: none; }
+        button:hover { background: #1e293b; border-color: #38bdf8; }
+        .badge-drought { padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px; white-space: nowrap; }
+        .d-wet { background: #064e3b; color: #a7f3d0; }
+        .d-norm { background: #1e293b; color: #cbd5e1; }
+        .d-mod { background: #78350f; color: #fde68a; }
+        .d-sev { background: #831843; color: #fbcfe8; }
+        .d-ext { background: #7f1d1d; color: #fecaca; }
+        .meta-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+        .meta-pill { background: #0e1726; border: 1px solid #1e293b; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #94a3b8; }
+        .meta-pill strong { color: #38bdf8; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Afzalpur Taluk Climate & Drought Analytics (1996–2055)</h1>
+            <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 14px;">
+                Direct Monthly SPI & SPEI Calculations (Scales: 1, 3, 6, 12) from Random Forest Predicted Water Balance
+            </p>
+        </div>
+        <div>
+            <span class="tag">Direct GLO / Gamma Integration</span>
+        </div>
+    </div>
+
+    <!-- Metadata Banner -->
+    <div class="meta-pills">
+        <div class="meta-pill"><strong>Location:</strong> Afzalpur Taluk (17.20° N, 76.36° E)</div>
+        <div class="meta-pill"><strong>Historical Baseline:</strong> 1996–2025 (360 Months)</div>
+        <div class="meta-pill"><strong>ML Horizon:</strong> 2026–2055 (360 Months Projected)</div>
+        <div class="meta-pill"><strong>Drought Methodology:</strong> Generalized Logistic (GLO) via ub-PWM</div>
+    </div>
+
+    <!-- Mathematical Formulas -->
+    <div class="card">
+        <h3 style="margin-top:0; color:#38bdf8;">Governing Formulations & Multi-Scale Calculations</h3>
+        
+        <div class="formula-box">
+            <strong>1. Climatic Water Balance & Rectangular Rolling Sums:</strong>
+            <p style="margin:4px 0 0 0; font-size:13px; color:#cbd5e1;">For each month $t$ across timescale $k \in \{1, 3, 6, 12\}$:</p>
+            $$D_t = P_t - \text{ET}_{0,t}, \qquad X_t^{(k)} = \sum_{j=0}^{k-1} D_{t-j}, \qquad R_t^{(k)} = \sum_{j=0}^{k-1} P_{t-j}$$
+        </div>
+
+        <div class="formula-box">
+            <strong>2. Direct SPEI Calculation via Generalized Logistic (GLO) Distribution:</strong>
+            <p style="margin:4px 0 0 0; font-size:13px; color:#cbd5e1;">Using calibrated monthly parameters $(\xi_{m,k}, \alpha_{m,k}, \kappa_{m,k})$:</p>
+            $$Y_t = 1 - \frac{\kappa_{m,k}}{\alpha_{m,k}} \left( X_t^{(k)} - \xi_{m,k} \right), \qquad F\left(X_t^{(k)}\right) = \frac{1}{1 + Y_t^{1/\kappa_{m,k}}}$$
+            $$\text{SPEI}_t^{(k)} = \Phi^{-1}\left(F\left(X_t^{(k)}\right)\right) \approx \pm \left( W - \frac{c_0 + c_1 W + c_2 W^2}{1 + d_1 W + d_2 W^2 + d_3 W^3} \right), \quad W = \sqrt{-2\ln(P)}$$
+        </div>
+
+        <div class="formula-box">
+            <strong>3. Direct SPI Calculation via 2-Parameter Gamma Distribution:</strong>
+            $$g(R) = \frac{1}{\beta^\alpha \Gamma(\alpha)} R^{\alpha - 1} e^{-R/\beta}, \qquad H\left(R_t^{(k)}\right) = q + (1 - q) G\left(R_t^{(k)}\right), \qquad \text{SPI}_t^{(k)} = \Phi^{-1}\left(H\left(R_t^{(k)}\right)\right)$$
+        </div>
+
+        <div class="formula-box">
+            <strong>4. Multi-Step Autoregressive Random Forest Regressor:</strong>
+            $$\hat{y}_{t}(\mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} T_b\left(\sin\left(\frac{2\pi m}{12}\right), \cos\left(\frac{2\pi m}{12}\right), y_{t-1}, y_{t-12}\right)$$
+        </div>
+    </div>
+
+    <!-- Chart Control & Display -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; flex-wrap:wrap; gap:10px;">
+            <h3 style="margin:0; color:#38bdf8;">Multi-Decadal Trajectory & Drought Analytics</h3>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <label for="varSelect" style="font-size:13px; color:#94a3b8;">Select View:</label>
+                <select id="varSelect" onchange="renderChart()">
+                    <optgroup label="SPEI Timescales (Calculated from Water Balance)">
+                        <option value="SPEI_12" selected>SPEI-12 (Annual Operational Drought)</option>
+                        <option value="SPEI_6">SPEI-6 (Medium-Term Hydrological Drought)</option>
+                        <option value="SPEI_3">SPEI-3 (Seasonal Agricultural Drought)</option>
+                        <option value="SPEI_1">SPEI-1 (Monthly Moisture Anomaly)</option>
+                        <option value="SPEI_ALL">All 4 SPEI Timescales (1, 3, 6, 12)</option>
+                    </optgroup>
+                    <optgroup label="SPI Timescales (Calculated from Rainfall)">
+                        <option value="SPI_12">SPI-12 (Annual Meteorological Drought)</option>
+                        <option value="SPI_6">SPI-6 (6-Month Rainfall Deficit)</option>
+                        <option value="SPI_3">SPI-3 (3-Month Seasonal Anomaly)</option>
+                        <option value="SPI_1">SPI-1 (1-Month Rainfall Anomaly)</option>
+                        <option value="COMPARE_12">SPI-12 vs SPEI-12 Comparison</option>
+                    </optgroup>
+                    <optgroup label="Raw Hydrometeorological Variables">
+                        <option value="Rainfall">Annual Precipitation (mm)</option>
+                        <option value="ETo">Annual Reference Evapotranspiration ETo (mm)</option>
+                        <option value="WaterBalance">Annual Climatic Water Balance (P - ETo mm)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div id="chartDiv" style="height: 520px;"></div>
+    </div>
+
+    <!-- Data Readings -->
+    <div class="grid-2">
+        <div class="card">
+            <h3 style="margin-top:0; color:#38bdf8;">Historical Observations (1996–2025)</h3>
+            <div class="table-scroll">
+                <table id="histTable">
+                    <thead><tr><th>Year</th><th>Rain (mm)</th><th>ETo (mm)</th><th>Balance</th><th>SPI-12</th><th>SPEI-12</th><th>Category</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <h3 style="margin-top:0; color:#4ade80;">Calculated 30-Year Future Projections (2026–2055)</h3>
+            <div class="table-scroll">
+                <table id="futureTable">
+                    <thead><tr><th>Year</th><th>Rain (mm)</th><th>ETo (mm)</th><th>Balance</th><th>SPEI-1</th><th>SPEI-3</th><th>SPEI-6</th><th>SPEI-12</th><th>Category</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let climateData = null;
+
+function getClassBadge(cls) {
+    if(!cls || cls === 'Not available') return `<span class="badge-drought d-norm">--</span>`;
+    let c = "d-norm";
+    if(cls.includes("Extremely wet") || cls.includes("Very wet") || cls.includes("Moderately wet")) c = "d-wet";
+    else if(cls.includes("Moderate drought")) c = "d-mod";
+    else if(cls.includes("Severe drought")) c = "d-sev";
+    else if(cls.includes("Extreme drought")) c = "d-ext";
+    return `<span class="badge-drought ${c}">${cls}</span>`;
+}
+
+async function init() {
+    try {
+        const res = await fetch('/data/climate_projections_1996_2055.json');
+        climateData = await res.json();
+        populateTables();
+        renderChart();
+    } catch(err) {
+        console.error("Data load error:", err);
+    }
+}
+
+function populateTables() {
+    const hTbody = document.querySelector("#histTable tbody");
+    hTbody.innerHTML = "";
+    climateData.historical_annual.forEach(r => {
+        hTbody.innerHTML += `<tr>
+            <td><strong>${r.YEAR}</strong></td>
+            <td>${r.Rainfall_mm.toFixed(1)}</td>
+            <td>${r.ETo_mm.toFixed(1)}</td>
+            <td style="color:${r.Water_Balance_mm < 0 ? '#f87171' : '#4ade80'}">${r.Water_Balance_mm.toFixed(1)}</td>
+            <td>${r.SPI_12 !== null ? r.SPI_12.toFixed(2) : '--'}</td>
+            <td>${r.SPEI_12 !== null ? r.SPEI_12.toFixed(2) : '--'}</td>
+            <td>${getClassBadge(r.SPEI_12_Class)}</td>
+        </tr>`;
+    });
+
+    const fTbody = document.querySelector("#futureTable tbody");
+    fTbody.innerHTML = "";
+    climateData.future_annual.forEach(r => {
+        fTbody.innerHTML += `<tr>
+            <td><strong>${r.YEAR}</strong></td>
+            <td>${r.Pred_Rainfall_mm.toFixed(1)}</td>
+            <td>${r.Pred_ETo_mm.toFixed(1)}</td>
+            <td style="color:${r.Pred_Water_Balance_mm < 0 ? '#f87171' : '#4ade80'}">${r.Pred_Water_Balance_mm.toFixed(1)}</td>
+            <td>${r.SPEI_1.toFixed(2)}</td>
+            <td>${r.SPEI_3.toFixed(2)}</td>
+            <td>${r.SPEI_6.toFixed(2)}</td>
+            <td style="font-weight:700; color:#38bdf8;">${r.SPEI_12.toFixed(2)}</td>
+            <td>${getClassBadge(r.SPEI_12_Class)}</td>
+        </tr>`;
+    });
+}
+
+function renderChart() {
+    const sel = document.getElementById("varSelect").value;
+    const hist = climateData.historical_annual;
+    const fut = climateData.future_annual;
+    let traces = [];
+    let yTitle = "";
+    let shapes = [];
+
+    const droughtThresholds = [
+        { type: 'line', x0: 1996, x1: 2055, y0: -1.0, y1: -1.0, line: { color: '#eab308', width: 1.5, dash: 'dot' } },
+        { type: 'line', x0: 1996, x1: 2055, y0: -1.5, y1: -1.5, line: { color: '#f97316', width: 1.5, dash: 'dot' } },
+        { type: 'line', x0: 1996, x1: 2055, y0: -2.0, y1: -2.0, line: { color: '#ef4444', width: 1.5, dash: 'dot' } }
+    ];
+
+    if (sel.startsWith("SPEI_") && sel !== "SPEI_ALL") {
+        yTitle = `${sel} Index`;
+        traces.push({
+            x: hist.map(d => d.YEAR), y: hist.map(d => d.SPEI_12),
+            name: 'Historical Baseline SPEI-12', mode: 'lines+markers',
+            line: { color: '#64748b', width: 2 }
+        });
+        traces.push({
+            x: fut.map(d => d.YEAR), y: fut.map(d => d[sel]),
+            name: `Projected ${sel} (Calculated from Water Balance)`, mode: 'lines+markers',
+            line: { color: '#f43f5e', width: 2.5 }
+        });
+        shapes = droughtThresholds;
+    } else if (sel === "SPEI_ALL") {
+        yTitle = "Calculated SPEI Index";
+        const colors = { 'SPEI_1': '#38bdf8', 'SPEI_3': '#34d399', 'SPEI_6': '#fbbf24', 'SPEI_12': '#f43f5e' };
+        ['SPEI_1', 'SPEI_3', 'SPEI_6', 'SPEI_12'].forEach(sc => {
+            traces.push({
+                x: fut.map(d => d.YEAR), y: fut.map(d => d[sc]),
+                name: `Future ${sc}`, mode: 'lines+markers',
+                line: { color: colors[sc], width: 2, dash: sc === 'SPEI_12' ? 'solid' : 'dot' }
+            });
+        });
+        shapes = droughtThresholds;
+    } else if (sel.startsWith("SPI_")) {
+        yTitle = `${sel} Index`;
+        traces.push({
+            x: hist.map(d => d.YEAR), y: hist.map(d => d.SPI_12),
+            name: 'Historical Baseline SPI-12', mode: 'lines+markers',
+            line: { color: '#64748b', width: 2 }
+        });
+        traces.push({
+            x: fut.map(d => d.YEAR), y: fut.map(d => d[sel]),
+            name: `Projected ${sel} (Calculated from Rainfall)`, mode: 'lines+markers',
+            line: { color: '#38bdf8', width: 2.5 }
+        });
+        shapes = droughtThresholds;
+    } else if (sel === "COMPARE_12") {
+        yTitle = "12-Month Drought Index";
+        traces.push({
+            x: fut.map(d => d.YEAR), y: fut.map(d => d.SPI_12),
+            name: 'Projected SPI-12 (Precipitation Deficit)', mode: 'lines+markers',
+            line: { color: '#38bdf8', width: 2.5 }
+        });
+        traces.push({
+            x: fut.map(d => d.YEAR), y: fut.map(d => d.SPEI_12),
+            name: 'Projected SPEI-12 (Climatic Water Deficit)', mode: 'lines+markers',
+            line: { color: '#f43f5e', width: 2.5 }
+        });
+        shapes = droughtThresholds;
+    } else {
+        let yHist, yFut, cHist = '#38bdf8', cFut = '#4ade80';
+        if (sel === 'Rainfall') {
+            yHist = hist.map(d => d.Rainfall_mm); yFut = fut.map(d => d.Pred_Rainfall_mm);
+            yTitle = 'Annual Rainfall (mm)';
+        } else if (sel === 'ETo') {
+            yHist = hist.map(d => d.ETo_mm); yFut = fut.map(d => d.Pred_ETo_mm);
+            yTitle = 'Annual ETo (mm)'; cHist = '#f87171'; cFut = '#fb923c';
+        } else {
+            yHist = hist.map(d => d.Water_Balance_mm); yFut = fut.map(d => d.Pred_Water_Balance_mm);
+            yTitle = 'Annual Climatic Water Balance (mm)'; cHist = '#94a3b8'; cFut = '#0284c7';
+        }
+        traces.push({
+            x: hist.map(d => d.YEAR), y: yHist,
+            name: 'Historical Observations', mode: 'lines+markers',
+            line: { color: cHist, width: 2.5 }
+        });
+        traces.push({
+            x: fut.map(d => d.YEAR), y: yFut,
+            name: 'RF Projected Trajectory', mode: 'lines+markers',
+            line: { color: cFut, dash: 'dash', width: 2.5 }
+        });
+    }
+
+    const layout = {
+        paper_bgcolor: '#131c31', plot_bgcolor: '#131c31', font: { color: '#e2e8f0' },
+        xaxis: { gridcolor: '#1e293b', title: 'Year', dtick: 5 },
+        yaxis: { gridcolor: '#1e293b', title: yTitle, zeroline: true, zerolinecolor: '#475569' },
+        shapes: shapes,
+        margin: { l: 60, r: 20, t: 20, b: 50 },
+        legend: { orientation: 'h', y: 1.12 }
+    };
+
+    Plotly.newPlot('chartDiv', traces, layout, {responsive: true});
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

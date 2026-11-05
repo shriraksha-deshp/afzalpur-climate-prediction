@@ -1,0 +1,29 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ClimateRecord {
+  id               Int      @id @default(autoincrement())
+  year             Int      @unique
+  isProjected      Boolean  @default(false)
+  rainfallMm       Float
+  etoMm            Float
+  waterBalanceMm   Float
+  meanTempC        Float?
+  spei1            Float?
+  spei3            Float?
+  spei6            Float?
+  spei12           Float?
+  spi1             Float?
+  spi3             Float?
+  spi6             Float?
+  spi12            Float?
+  speiClass        String?
+  spiClass         String?
+  createdAt        DateTime @default(now())
+}
